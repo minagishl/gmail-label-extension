@@ -47,8 +47,8 @@ function createVisualLabel(labelName) {
 	div.style.display = 'flex';
 	div.style.alignItems = 'center';
 	div.style.justifyContent = 'center';
-	div.style.margin = '0px 4px 0 0';
-	div.style.padding = '2px 4px';
+	div.style.margin = '0px 10px 0 0';
+	div.style.padding = '2px 6px';
 	div.style.whiteSpace = 'nowrap';
 
 	const p = document.createElement('p');
