@@ -39,10 +39,10 @@ function searchMailElement() {
 }
 
 // Create visual label for an email
-function createVisualLabel(labelName) {
+function createVisualLabel(labelName, color = '#4285f4') {
 	const div = document.createElement('div');
 	div.style.height = '16px';
-	div.style.backgroundColor = '#4285f4';
+	div.style.backgroundColor = color;
 	div.style.borderRadius = '4px';
 	div.style.display = 'flex';
 	div.style.alignItems = 'center';
@@ -98,7 +98,7 @@ async function processEmailElement(element) {
 
 			// Only add if label doesn't exist yet
 			if (!labelExists) {
-				const visualLabel = createVisualLabel(rule.label);
+				const visualLabel = createVisualLabel(rule.label, rule.color);
 				visualLabel.classList.add('gmail-label-extension'); // Add identifier class
 				element.appendChild(visualLabel);
 			}
