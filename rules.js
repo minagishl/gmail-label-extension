@@ -15,7 +15,38 @@ document.getElementById('saveImport').addEventListener('click', saveImportedRule
 document.getElementById('cancelImport').addEventListener('click', hideImportExport);
 
 // Load existing rules on page load
-document.addEventListener('DOMContentLoaded', loadRules);
+document.addEventListener('DOMContentLoaded', () => {
+	loadRules();
+	setupColorTypeHandlers();
+});
+
+// Setup color type radio button handlers
+function setupColorTypeHandlers() {
+	const usePreset = document.getElementById('usePreset');
+	const useCustom = document.getElementById('useCustom');
+	const presetColors = document.querySelector('.color-options');
+	const customColor = document.getElementById('customColor');
+
+	function updateColorInputs() {
+		if (usePreset.checked) {
+			presetColors.style.opacity = '1';
+			presetColors.style.pointerEvents = 'auto';
+			customColor.style.opacity = '0.5';
+			customColor.disabled = true;
+		} else {
+			presetColors.style.opacity = '0.5';
+			presetColors.style.pointerEvents = 'none';
+			customColor.style.opacity = '1';
+			customColor.disabled = false;
+		}
+	}
+
+	usePreset.addEventListener('change', updateColorInputs);
+	useCustom.addEventListener('change', updateColorInputs);
+
+	// Initialize state
+	updateColorInputs();
+}
 
 function showAddRuleForm() {
 	if (editingRuleIndex === -1) {
@@ -53,8 +84,10 @@ function clearForm() {
 	document.getElementById('email').value = '';
 	document.getElementById('subject').value = '';
 	document.getElementById('content').value = '';
-	// Reset to default color
+	// Reset to default preset color
+	document.getElementById('usePreset').checked = true;
 	document.querySelector('input[name="labelColor"][value="#4285f4"]').checked = true;
+	document.getElementById('customColor').value = '#4285f4';
 }
 
 function loadRules() {
@@ -113,7 +146,9 @@ function displayRules(rules) {
 function saveRule() {
 	const rule = {
 		label: document.getElementById('labelName').value.trim(),
-		color: document.querySelector('input[name="labelColor"]:checked').value || '#4285f4',
+		color: document.getElementById('useCustom').checked
+			? document.getElementById('customColor').value
+			: document.querySelector('input[name="labelColor"]:checked').value || '#4285f4',
 		sender: document.getElementById('sender').value.trim(),
 		email: document.getElementById('email').value.trim(),
 		subject: document.getElementById('subject').value.trim(),
@@ -163,10 +198,13 @@ function editRule(index) {
 		document.getElementById('content').value = rule.content || '';
 
 		// Set color
-		if (rule.color) {
-			document.querySelector(`input[name="labelColor"][value="${rule.color}"]`).checked = true;
+		const colorInput = document.querySelector(`input[name="labelColor"][value="${rule.color}"]`);
+		if (colorInput) {
+			document.getElementById('usePreset').checked = true;
+			colorInput.checked = true;
 		} else {
-			document.querySelector('input[name="labelColor"][value="#4285f4"]').checked = true;
+			document.getElementById('useCustom').checked = true;
+			document.getElementById('customColor').value = rule.color || '#4285f4';
 		}
 
 		editingRuleIndex = index;
