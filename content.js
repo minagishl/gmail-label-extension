@@ -62,11 +62,6 @@ function createVisualLabel(labelName) {
 
 // Process a single email element
 async function processEmailElement(element) {
-	// Check if element already has a label
-	if (element.querySelector('.gmail-label-extension')) {
-		return;
-	}
-
 	// Get email content from the element
 	const content = element.textContent || '';
 
@@ -92,11 +87,18 @@ async function processEmailElement(element) {
 		if (!matches && ruleContent && emailText.includes(ruleContent)) matches = true;
 
 		if (matches) {
-			// Add visual label to email row
-			const visualLabel = createVisualLabel(rule.label);
-			visualLabel.classList.add('gmail-label-extension'); // Add identifier class
-			element.appendChild(visualLabel);
-			break; // Stop after first matching rule
+			// Check if this label already exists
+			const existingLabels = element.querySelectorAll('.gmail-label-extension');
+			const labelExists = Array.from(existingLabels).some(
+				(label) => label.textContent === rule.label
+			);
+
+			// Only add if label doesn't exist yet
+			if (!labelExists) {
+				const visualLabel = createVisualLabel(rule.label);
+				visualLabel.classList.add('gmail-label-extension'); // Add identifier class
+				element.appendChild(visualLabel);
+			}
 		}
 	}
 }
