@@ -53,6 +53,8 @@ function clearForm() {
 	document.getElementById('email').value = '';
 	document.getElementById('subject').value = '';
 	document.getElementById('content').value = '';
+	// Reset to default color
+	document.querySelector('input[name="labelColor"][value="#4285f4"]').checked = true;
 }
 
 function loadRules() {
@@ -74,7 +76,12 @@ function displayRules(rules) {
 		const ruleCard = document.createElement('div');
 		ruleCard.className = 'rule-card';
 		ruleCard.innerHTML = `
-      <h3>Rule ${index + 1}: ${rule.label}</h3>
+      <h3>
+        <span class="color-dot" style="background-color: ${
+					rule.color || '#4285f4'
+				}; width: 12px; height: 12px; display: inline-block; border-radius: 50%; margin-right: 8px;"></span>
+        Rule ${index + 1}: ${rule.label}
+      </h3>
       ${rule.sender ? `<p><strong>Sender:</strong> ${rule.sender}</p>` : ''}
       ${rule.email ? `<p><strong>Email:</strong> ${rule.email}</p>` : ''}
       ${rule.subject ? `<p><strong>Subject contains:</strong> ${rule.subject}</p>` : ''}
@@ -106,6 +113,7 @@ function displayRules(rules) {
 function saveRule() {
 	const rule = {
 		label: document.getElementById('labelName').value.trim(),
+		color: document.querySelector('input[name="labelColor"]:checked').value || '#4285f4',
 		sender: document.getElementById('sender').value.trim(),
 		email: document.getElementById('email').value.trim(),
 		subject: document.getElementById('subject').value.trim(),
@@ -153,6 +161,13 @@ function editRule(index) {
 		document.getElementById('email').value = rule.email || '';
 		document.getElementById('subject').value = rule.subject || '';
 		document.getElementById('content').value = rule.content || '';
+
+		// Set color
+		if (rule.color) {
+			document.querySelector(`input[name="labelColor"][value="${rule.color}"]`).checked = true;
+		} else {
+			document.querySelector('input[name="labelColor"][value="#4285f4"]').checked = true;
+		}
 
 		editingRuleIndex = index;
 

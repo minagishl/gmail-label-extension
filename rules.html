@@ -104,6 +104,29 @@
     .delete-button:hover {
       background-color: #c82333;
     }
+
+    .color-picker {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .color-option {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-block;
+      border: 2px solid transparent;
+    }
+
+    input[type="radio"] {
+      display: none;
+    }
+
+    input[type="radio"]:checked+.color-option {
+      border-color: #000;
+    }
   </style>
 </head>
 
@@ -125,6 +148,21 @@
     <div class="form-group">
       <label>Label Name:</label>
       <input type="text" id="labelName" placeholder="e.g., Important, Work, Personal">
+    </div>
+    <div class="form-group">
+      <label>Label Color:</label>
+      <div class="color-picker">
+        <input type="radio" name="labelColor" value="#4285f4" id="color1" checked>
+        <label for="color1" class="color-option" style="background-color: #4285f4;"></label>
+        <input type="radio" name="labelColor" value="#0f9d58" id="color2">
+        <label for="color2" class="color-option" style="background-color: #0f9d58;"></label>
+        <input type="radio" name="labelColor" value="#db4437" id="color3">
+        <label for="color3" class="color-option" style="background-color: #db4437;"></label>
+        <input type="radio" name="labelColor" value="#f4b400" id="color4">
+        <label for="color4" class="color-option" style="background-color: #f4b400;"></label>
+        <input type="radio" name="labelColor" value="#ab47bc" id="color5">
+        <label for="color5" class="color-option" style="background-color: #ab47bc;"></label>
+      </div>
     </div>
     <div class="form-group">
       <label>Sender Name (optional):</label>
