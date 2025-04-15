@@ -173,3 +173,17 @@ async function watchMailRowsContainer() {
 
 // Start watching the mail rows container
 setTimeout(watchMailRowsContainer, 2000);
+
+// Watch for changes in storage
+chrome.storage.onChanged.addListener((changes, namespace) => {
+	if (namespace === 'sync' && changes.labelRules) {
+		// Clear existing labels
+		const existingLabels = document.querySelectorAll('.gmail-label-extension');
+		existingLabels.forEach((label) => label.remove());
+
+		// Reprocess emails with new rules
+		processEmails().catch((error) => {
+			console.error('Error processing emails after rules update:', error);
+		});
+	}
+});
