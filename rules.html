@@ -164,6 +164,11 @@
       align-items: center;
       margin: 0;
     }
+
+    .rule-actions {
+      display: flex;
+      margin-top: 10px;
+    }
   </style>
 </head>
 
@@ -242,8 +247,10 @@
     <h2>Import/Export Rules</h2>
     <p>Paste JSON rules below or copy current rules to share:</p>
     <textarea id="jsonData"></textarea>
-    <button id="saveImport">Save</button>
-    <button id="cancelImport">Cancel</button>
+    <div class="rule-actions">
+      <button id="saveImport">Save</button>
+      <button id="cancelImport">Cancel</button>
+    </div>
   </div>
 
   <script src="rules.js"></script>
