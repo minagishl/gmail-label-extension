@@ -170,19 +170,23 @@
     </div>
     <div class="form-group">
       <label>Sender Name (optional):</label>
-      <input type="text" id="sender" placeholder="e.g., John Doe">
+      <input type="text" id="sender" placeholder="e.g., John Doe, Jane Smith">
+      <small style="color: #666; display: block; margin-top: 4px;">Separate multiple names with commas</small>
     </div>
     <div class="form-group">
       <label>Email Address (optional):</label>
-      <input type="text" id="email" placeholder="e.g., example@domain.com">
+      <input type="text" id="email" placeholder="e.g., example@domain.com, other@domain.com">
+      <small style="color: #666; display: block; margin-top: 4px;">Separate multiple emails with commas</small>
     </div>
     <div class="form-group">
       <label>Subject Contains (optional):</label>
-      <input type="text" id="subject" placeholder="e.g., Invoice, Meeting">
+      <input type="text" id="subject" placeholder="e.g., Invoice, Meeting, Report">
+      <small style="color: #666; display: block; margin-top: 4px;">Separate multiple keywords with commas</small>
     </div>
     <div class="form-group">
       <label>Content Contains (optional):</label>
-      <input type="text" id="content" placeholder="Search for text in email body">
+      <input type="text" id="content" placeholder="e.g., urgent, important, review">
+      <small style="color: #666; display: block; margin-top: 4px;">Separate multiple keywords with commas</small>
     </div>
     <button id="saveRule">Save Rule</button>
     <button id="cancelRule">Cancel</button>
@@ -200,10 +204,10 @@
       "labelRules": [
       {
       "label": "Work",
-      "sender": "John Doe",
-      "email": "john@company.com",
-      "subject": "Meeting",
-      "content": "project update"
+      "sender": "John Doe, Jane Smith",
+      "email": "john@company.com, jane@company.com",
+      "subject": "Meeting, Update, Report",
+      "content": "project update, deadline, review"
       }
       ]
       }</div>

@@ -79,11 +79,31 @@ async function processEmailElement(element) {
 		// Match against rule conditions with specific email parts
 		const matchesSender =
 			rule.sender &&
-			(senderName.includes(rule.sender.toLowerCase()) ||
-				sender.includes(rule.sender.toLowerCase()));
-		const matchesEmail = rule.email && sender.includes(rule.email.toLowerCase());
-		const matchesSubject = rule.subject && subject.includes(rule.subject.toLowerCase());
-		const matchesContent = rule.content && snippet.includes(rule.content.toLowerCase());
+			rule.sender
+				.toLowerCase()
+				.split(',')
+				.some(
+					(word) =>
+						word.trim() && (senderName.includes(word.trim()) || sender.includes(word.trim()))
+				);
+		const matchesEmail =
+			rule.email &&
+			rule.email
+				.toLowerCase()
+				.split(',')
+				.some((word) => word.trim() && sender.includes(word.trim()));
+		const matchesSubject =
+			rule.subject &&
+			rule.subject
+				.toLowerCase()
+				.split(',')
+				.some((word) => word.trim() && subject.includes(word.trim()));
+		const matchesContent =
+			rule.content &&
+			rule.content
+				.toLowerCase()
+				.split(',')
+				.some((word) => word.trim() && snippet.includes(word.trim()));
 
 		// If any condition matches, set matches to true
 		matches = matchesSender || matchesEmail || matchesSubject || matchesContent;
