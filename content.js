@@ -77,21 +77,17 @@ async function processEmailElement(element) {
 		let matches = false;
 
 		// Match against rule conditions with specific email parts
-		if (
+		// Check each condition separately
+		const matchesSender =
 			rule.sender &&
-			(senderName.includes(rule.sender.toLowerCase()) || sender.includes(rule.sender.toLowerCase()))
-		) {
-			matches = true;
-		}
-		if (!matches && rule.email && sender.includes(rule.email.toLowerCase())) {
-			matches = true;
-		}
-		if (!matches && rule.subject && subject.includes(rule.subject.toLowerCase())) {
-			matches = true;
-		}
-		if (!matches && rule.content && snippet.includes(rule.content.toLowerCase())) {
-			matches = true;
-		}
+			(senderName.includes(rule.sender.toLowerCase()) ||
+				sender.includes(rule.sender.toLowerCase()));
+		const matchesEmail = rule.email && sender.includes(rule.email.toLowerCase());
+		const matchesSubject = rule.subject && subject.includes(rule.subject.toLowerCase());
+		const matchesContent = rule.content && snippet.includes(rule.content.toLowerCase());
+
+		// If any condition matches, set matches to true
+		matches = matchesSender || matchesEmail || matchesSubject || matchesContent;
 
 		if (matches) {
 			// Check if this label already exists
