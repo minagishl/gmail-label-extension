@@ -77,7 +77,6 @@ async function processEmailElement(element) {
 		let matches = false;
 
 		// Match against rule conditions with specific email parts
-		// Check each condition separately
 		const matchesSender =
 			rule.sender &&
 			(senderName.includes(rule.sender.toLowerCase()) ||
@@ -90,8 +89,15 @@ async function processEmailElement(element) {
 		matches = matchesSender || matchesEmail || matchesSubject || matchesContent;
 
 		if (matches) {
-			// Check if this label already exists
-			const existingLabels = element.querySelectorAll('.gmail-label-extension');
+			// First, find the specified td cell
+			let targetCell = element.querySelector('td[role="gridcell"][tabindex="-1"]');
+			// If the cell is not found, fallback to the traditional element
+			if (!targetCell) {
+				targetCell = element;
+			}
+
+			// Check if this label already exists inside the target cell
+			const existingLabels = targetCell.querySelectorAll('.gmail-label-extension');
 			const labelExists = Array.from(existingLabels).some(
 				(label) => label.textContent === rule.label
 			);
@@ -100,7 +106,7 @@ async function processEmailElement(element) {
 			if (!labelExists) {
 				const visualLabel = createVisualLabel(rule.label, rule.color);
 				visualLabel.classList.add('gmail-label-extension'); // Add identifier class
-				element.appendChild(visualLabel);
+				targetCell.appendChild(visualLabel);
 			}
 		}
 	}
