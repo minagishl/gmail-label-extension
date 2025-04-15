@@ -62,8 +62,11 @@ function createVisualLabel(labelName) {
 
 // Process a single email element
 async function processEmailElement(element) {
-	// Get email content from the element
-	const content = element.textContent || '';
+	// Get specific parts of the email
+	const sender = element.querySelector('[email]')?.getAttribute('email')?.toLowerCase() || '';
+	const senderName = element.querySelector('[name]')?.getAttribute('name')?.toLowerCase() || '';
+	const subject = element.querySelector('[data-thread-id]')?.textContent?.toLowerCase() || '';
+	const snippet = element.querySelector('.y2')?.textContent?.toLowerCase() || '';
 
 	// Get rules from storage
 	const data = await chrome.storage.sync.get('labelRules');
@@ -73,18 +76,22 @@ async function processEmailElement(element) {
 	for (const rule of rules) {
 		let matches = false;
 
-		// Extract email parts for matching
-		const emailText = content.toLowerCase();
-		const ruleSender = rule.sender?.toLowerCase();
-		const ruleEmail = rule.email?.toLowerCase();
-		const ruleSubject = rule.subject?.toLowerCase();
-		const ruleContent = rule.content?.toLowerCase();
-
-		// Match against rule conditions
-		if (ruleSender && emailText.includes(ruleSender)) matches = true;
-		if (!matches && ruleEmail && emailText.includes(ruleEmail)) matches = true;
-		if (!matches && ruleSubject && emailText.includes(ruleSubject)) matches = true;
-		if (!matches && ruleContent && emailText.includes(ruleContent)) matches = true;
+		// Match against rule conditions with specific email parts
+		if (
+			rule.sender &&
+			(senderName.includes(rule.sender.toLowerCase()) || sender.includes(rule.sender.toLowerCase()))
+		) {
+			matches = true;
+		}
+		if (!matches && rule.email && sender.includes(rule.email.toLowerCase())) {
+			matches = true;
+		}
+		if (!matches && rule.subject && subject.includes(rule.subject.toLowerCase())) {
+			matches = true;
+		}
+		if (!matches && rule.content && snippet.includes(rule.content.toLowerCase())) {
+			matches = true;
+		}
 
 		if (matches) {
 			// Check if this label already exists
