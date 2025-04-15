@@ -207,6 +207,14 @@ function editRule(index) {
 			document.getElementById('customColor').value = rule.color || '#4285f4';
 		}
 
+		// Trigger color input update
+		const event = new Event('change');
+		if (colorInput) {
+			document.getElementById('usePreset').dispatchEvent(event);
+		} else {
+			document.getElementById('useCustom').dispatchEvent(event);
+		}
+
 		editingRuleIndex = index;
 
 		// Make sure form is visible and values are set
