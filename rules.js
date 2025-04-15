@@ -66,6 +66,9 @@ function showImportExport() {
 	importExportDiv.classList.remove('hidden');
 	addRuleForm.classList.add('hidden');
 
+	// Scroll to bottom of the page
+	window.scrollTo(0, document.body.scrollHeight);
+
 	// Load current rules into textarea
 	chrome.storage.sync.get('labelRules', function (data) {
 		const rules = data.labelRules || [];
