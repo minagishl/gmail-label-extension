@@ -220,6 +220,9 @@ function editRule(index) {
 		// Make sure form is visible and values are set
 		requestAnimationFrame(() => {
 			showAddRuleForm();
+			// Scroll to bottom of the page
+			window.scrollTo(0, document.body.scrollHeight);
+
 			console.log('Form values after show:', {
 				label: document.getElementById('labelName').value,
 				sender: document.getElementById('sender').value,
