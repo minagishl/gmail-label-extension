@@ -1,3 +1,25 @@
+// Search for the div that affects mail rows
+function searchMailRowsContainer() {
+	return new Promise((resolve) => {
+		const interval = setInterval(() => {
+			const navigationDiv = document.querySelector('div[role="navigation"]');
+			if (navigationDiv) {
+				const parent = navigationDiv.parentElement;
+				if (parent) {
+					// Find all sibling divs
+					const siblingDivs = Array.from(parent.children).filter((el) => el.tagName === 'DIV');
+					// Get the third div after navigationDiv
+					const targetDiv = siblingDivs[siblingDivs.indexOf(navigationDiv) + 3];
+					if (targetDiv) {
+						clearInterval(interval);
+						resolve(targetDiv);
+					}
+				}
+			}
+		}, 1000);
+	});
+}
+
 // Search for mail container element
 function searchMailElement() {
 	return new Promise((resolve) => {
@@ -130,3 +152,19 @@ async function initializeExtension() {
 
 // Start the extension with a delay to ensure Gmail is loaded
 setTimeout(initializeExtension, 2000);
+
+// Watch for changes in the mail rows container
+async function watchMailRowsContainer() {
+	const container = await searchMailRowsContainer();
+	if (container) {
+		const observer = new MutationObserver((mutations) => {
+			processEmails().catch((error) => {
+				console.error('Error in mail rows container observer:', error);
+			});
+		});
+		observer.observe(container, { childList: true, subtree: true });
+	}
+}
+
+// Start watching the mail rows container
+setTimeout(watchMailRowsContainer, 2000);
