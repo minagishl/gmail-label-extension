@@ -1,37 +1,47 @@
-document.addEventListener('DOMContentLoaded', function () {
-	const openRulesButton = document.getElementById('openRules');
-	const applyRulesButton = document.getElementById('applyRules');
-	const statusDiv = document.getElementById('status');
+import { useState } from 'react';
 
-	openRulesButton.addEventListener('click', function () {
+const Popup = () => {
+	const [status, setStatus] = useState<string>('');
+
+	const handleOpenRules = () => {
 		chrome.tabs.create({
-			url: chrome.runtime.getURL('rules.html'),
+			url: chrome.runtime.getURL('src/rules.html'),
 		});
-	});
+	};
 
-	applyRulesButton.addEventListener('click', async function () {
+	const handleApplyRules = async () => {
 		const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-		if (!tab.url.includes('mail.google.com')) {
-			statusDiv.textContent = 'Please open Gmail to apply rules';
+		if (!tab?.url?.includes('mail.google.com')) {
+			setStatus('Please open Gmail to apply rules');
 			return;
 		}
 
-		statusDiv.textContent = 'Applying rules...';
+		setStatus('Applying rules...');
 
 		try {
-			await chrome.scripting.executeScript({
-				target: { tabId: tab.id },
-				function: applyLabelRules,
-			});
-			statusDiv.textContent = 'Rules applied successfully!';
+			if (tab.id) {
+				await chrome.scripting.executeScript({
+					target: { tabId: tab.id },
+					func: applyLabelRules,
+				});
+				setStatus('Rules applied successfully!');
+			}
 		} catch (error) {
-			statusDiv.textContent = 'Error applying rules: ' + error.message;
+			setStatus(`Error applying rules: ${(error as Error).message}`);
 		}
-	});
-});
+	};
+
+	return (
+		<div className='popup-container'>
+			<button onClick={handleOpenRules}>Configure Rules</button>
+			<button onClick={handleApplyRules}>Apply Rules</button>
+			{status && <div className='status'>{status}</div>}
+		</div>
+	);
+};
 
 // This function will be injected into the Gmail page
-function applyLabelRules() {
+function applyLabelRules(): void {
 	chrome.storage.sync.get('labelRules', function (data) {
 		const rules = data.labelRules || [];
 		if (rules.length === 0) {
@@ -39,7 +49,6 @@ function applyLabelRules() {
 			return;
 		}
 
-		// Using the provided email extraction function
 		const container = document.querySelector('div[id=":1"]');
 		if (!container) {
 			console.warn('Gmail container not found');
@@ -52,7 +61,7 @@ function applyLabelRules() {
 			const subjectEl = row.querySelector('div[role="link"] > div > div > span');
 			const snippetEl = row.querySelector('div[role="link"] > div > span');
 
-			const senderName = senderEl ? senderEl.textContent.trim() : null;
+			const senderName = senderEl ? senderEl.textContent?.trim() : null;
 			const senderEmail =
 				senderEl?.getAttribute('email') || senderEl?.getAttribute('data-hovercard-id') || null;
 
@@ -60,14 +69,14 @@ function applyLabelRules() {
 				element: row,
 				sender: senderName,
 				email: senderEmail,
-				subject: subjectEl ? subjectEl.textContent.trim() : null,
-				snippet: snippetEl ? snippetEl.textContent.trim().replace(/^ – /, '') : null,
+				subject: subjectEl ? subjectEl.textContent?.trim() : null,
+				snippet: snippetEl ? snippetEl.textContent?.trim()?.replace(/^ – /, '') : null,
 			};
 		});
 
 		// Apply rules to each email
 		emails.forEach((email) => {
-			rules.forEach((rule) => {
+			rules.forEach((rule: any) => {
 				let matches = false;
 
 				if (rule.sender && email.sender) {
@@ -91,3 +100,5 @@ function applyLabelRules() {
 		});
 	});
 }
+
+export default Popup;

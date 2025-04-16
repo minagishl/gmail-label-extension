@@ -1,5 +1,7 @@
+import { StorageData } from './types';
+
 // Search for the div that affects mail rows
-function searchMailRowsContainer() {
+function searchMailRowsContainer(): Promise<HTMLElement> {
 	return new Promise((resolve) => {
 		const interval = setInterval(() => {
 			const navigationDiv = document.querySelector('div[role="navigation"]');
@@ -9,7 +11,7 @@ function searchMailRowsContainer() {
 					// Find all sibling divs
 					const siblingDivs = Array.from(parent.children).filter((el) => el.tagName === 'DIV');
 					// Get the third div after navigationDiv
-					const targetDiv = siblingDivs[siblingDivs.indexOf(navigationDiv) + 3];
+					const targetDiv = siblingDivs[siblingDivs.indexOf(navigationDiv) + 3] as HTMLElement;
 					if (targetDiv) {
 						clearInterval(interval);
 						resolve(targetDiv);
@@ -21,25 +23,25 @@ function searchMailRowsContainer() {
 }
 
 // Search for mail container element
-function searchMailElement() {
+function searchMailElement(): Promise<HTMLElement> {
 	return new Promise((resolve) => {
 		const interval = setInterval(() => {
 			const p1 = document.querySelector('table[role="grid"] > tbody');
 			const p2 = document.querySelector('table[aria-readonly="true"] > tbody');
 			if (p1) {
 				clearInterval(interval);
-				resolve(p1);
+				resolve(p1 as HTMLElement);
 			}
 			if (p2) {
 				clearInterval(interval);
-				resolve(p2);
+				resolve(p2 as HTMLElement);
 			}
 		}, 1000);
 	});
 }
 
 // Create visual label for an email
-function createVisualLabel(labelName, color = '#4285f4') {
+function createVisualLabel(labelName: string, color = '#4285f4'): HTMLDivElement {
 	const div = document.createElement('div');
 	div.style.height = '16px';
 	div.style.backgroundColor = color;
@@ -61,7 +63,7 @@ function createVisualLabel(labelName, color = '#4285f4') {
 }
 
 // Process a single email element
-async function processEmailElement(element) {
+async function processEmailElement(element: HTMLElement): Promise<void> {
 	// Get specific parts of the email
 	const sender = element.querySelector('[email]')?.getAttribute('email')?.toLowerCase() || '';
 	const senderName = element.querySelector('[name]')?.getAttribute('name')?.toLowerCase() || '';
@@ -69,7 +71,7 @@ async function processEmailElement(element) {
 	const snippet = element.querySelector('.y2')?.textContent?.toLowerCase() || '';
 
 	// Get rules from storage
-	const data = await chrome.storage.sync.get('labelRules');
+	const data = (await chrome.storage.sync.get('labelRules')) as StorageData;
 	const rules = data.labelRules || [];
 
 	// Check each rule
@@ -106,7 +108,7 @@ async function processEmailElement(element) {
 				.some((word) => word.trim() && snippet.includes(word.trim()));
 
 		// If any condition matches, set matches to true
-		matches = matchesSender || matchesEmail || matchesSubject || matchesContent;
+		matches = Boolean(matchesSender || matchesEmail || matchesSubject || matchesContent);
 
 		if (matches) {
 			// First, find the specified td cell
@@ -133,7 +135,7 @@ async function processEmailElement(element) {
 }
 
 // Main function to process emails
-async function processEmails() {
+async function processEmails(): Promise<void> {
 	try {
 		// Find mail container
 		const mailElement = await searchMailElement();
@@ -143,7 +145,7 @@ async function processEmails() {
 		const emailRows = mailElement.childNodes;
 		for (const element of emailRows) {
 			if (element.nodeType === Node.ELEMENT_NODE) {
-				await processEmailElement(element);
+				await processEmailElement(element as HTMLElement);
 			}
 		}
 	} catch (error) {
@@ -152,20 +154,20 @@ async function processEmails() {
 }
 
 // Initialize the extension
-async function initializeExtension() {
+async function initializeExtension(): Promise<void> {
 	try {
 		// Initial processing
 		await processEmails();
 
 		// Set up history state observer
 		const pushState = history.pushState;
-		history.pushState = function () {
-			pushState.apply(history, arguments);
+		history.pushState = function (data: any, unused: string, url?: string | URL) {
+			pushState.call(history, data, unused, url);
 			setTimeout(processEmails, 1000);
 		};
 
 		// Create MutationObserver to watch for new emails
-		const observer = new MutationObserver((mutations) => {
+		const observer = new MutationObserver(() => {
 			processEmails().catch((error) => {
 				console.error('Error in mutation observer:', error);
 			});
@@ -185,10 +187,10 @@ async function initializeExtension() {
 setTimeout(initializeExtension, 2000);
 
 // Watch for changes in the mail rows container
-async function watchMailRowsContainer() {
+async function watchMailRowsContainer(): Promise<void> {
 	const container = await searchMailRowsContainer();
 	if (container) {
-		const observer = new MutationObserver((mutations) => {
+		const observer = new MutationObserver(() => {
 			processEmails().catch((error) => {
 				console.error('Error in mail rows container observer:', error);
 			});
