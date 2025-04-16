@@ -115,14 +115,14 @@ const Rules: React.FC = () => {
         throw new Error("Invalid format: missing labelRules array");
       }
 
-      data.labelRules.forEach((rule: LabelRule) => {
+      for (const rule of data.labelRules) {
         if (!rule.label) {
           throw new Error("Each rule must have a label name");
         }
         if (!rule.sender && !rule.email && !rule.subject && !rule.content) {
           throw new Error("Each rule must have at least one condition");
         }
-      });
+      }
 
       chrome.storage.sync.set({ labelRules: data.labelRules }, () => {
         setShowImportExport(false);
@@ -131,7 +131,7 @@ const Rules: React.FC = () => {
         alert("Rules imported successfully!");
       });
     } catch (error) {
-      alert("Error importing rules: " + (error as Error).message);
+      alert(`Error importing rules: ${(error as Error).message}`);
     }
   };
 
@@ -186,18 +186,21 @@ const Rules: React.FC = () => {
             setNewRule(emptyRule);
             setShowImportExport(false);
           }}
+          type="button"
           className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
         >
           Add New Rule
         </button>
         <button
           onClick={showImportExportForm}
+          type="button"
           className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
         >
           Import Rules
         </button>
         <button
           onClick={handleExport}
+          type="button"
           className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
         >
           Export Rules
@@ -224,7 +227,9 @@ const Rules: React.FC = () => {
           </div>
 
           <div className="mb-4">
-            <label className="mb-1 block font-medium">Label Color</label>
+            <label htmlFor="labelColor" className="mb-1 block font-medium">
+              Label Color
+            </label>
             <div className="mt-2.5 flex flex-wrap gap-2.5">
               {presetColors.map((color) => (
                 <label key={color} className="relative">
@@ -245,10 +250,11 @@ const Rules: React.FC = () => {
                       borderColor:
                         newRule.color === color ? "#000" : "transparent",
                     }}
-                  ></span>
+                  />
                 </label>
               ))}
               <input
+                id="labelColor"
                 type="color"
                 className="w-24 p-1"
                 value={newRule.color}
@@ -322,6 +328,7 @@ const Rules: React.FC = () => {
           <div className="mt-5 flex gap-2.5">
             <button
               onClick={handleAddRule}
+              type="button"
               className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               Save Rule
@@ -331,6 +338,7 @@ const Rules: React.FC = () => {
                 setShowAddForm(false);
                 resetForm();
               }}
+              type="button"
               className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               Cancel
@@ -346,7 +354,7 @@ const Rules: React.FC = () => {
         ) : (
           rules.map((rule, index) => (
             <div
-              key={index}
+              key={`${rule.label}-${rule.sender}-${rule.email}-${index}`}
               className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
             >
               {editingRules.has(index) ? (
@@ -377,7 +385,10 @@ const Rules: React.FC = () => {
                   </div>
 
                   <div className="mb-4">
-                    <label className="mb-1 block font-medium">
+                    <label
+                      htmlFor={`labelColor-${index}`}
+                      className="mb-1 block font-medium"
+                    >
                       Label Color
                     </label>
                     <div className="mt-2.5 flex flex-wrap gap-2.5">
@@ -408,7 +419,7 @@ const Rules: React.FC = () => {
                                   ? "#000"
                                   : "transparent",
                             }}
-                          ></span>
+                          />
                         </label>
                       ))}
                       <input
@@ -527,12 +538,14 @@ const Rules: React.FC = () => {
                   <div className="mt-5 flex gap-2.5">
                     <button
                       onClick={() => handleSubmit(index)}
+                      type="button"
                       className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => handleEdit(index)}
+                      type="button"
                       className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                     >
                       Cancel
@@ -545,7 +558,7 @@ const Rules: React.FC = () => {
                     <span
                       className="inline-block h-3 w-3 rounded-full"
                       style={{ backgroundColor: rule.color }}
-                    ></span>
+                    />
                     Rule {index + 1}: {rule.label}
                   </h3>
                   {rule.sender && (
@@ -571,12 +584,14 @@ const Rules: React.FC = () => {
                   <div className="mt-2.5 flex gap-2.5">
                     <button
                       onClick={() => handleEdit(index)}
+                      type="button"
                       className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                     >
                       Edit
                     </button>
                     <button
                       className="cursor-pointer rounded border-none bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                      type="button"
                       onClick={() => handleDelete(index)}
                     >
                       Delete
@@ -602,6 +617,7 @@ const Rules: React.FC = () => {
           <div className="mt-5 flex gap-2.5">
             <button
               onClick={handleImport}
+              type="button"
               className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               Save
@@ -611,6 +627,7 @@ const Rules: React.FC = () => {
                 setShowImportExport(false);
                 setJsonData("");
               }}
+              type="button"
               className="cursor-pointer rounded border-none bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               Cancel
