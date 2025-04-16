@@ -40,18 +40,18 @@ const Popup = () => {
       <div className="flex flex-col gap-2">
         <button
           onClick={handleOpenRules}
-          className="w-full px-2 py-2 text-sm text-white bg-blue-500 hover:bg-blue-600 rounded cursor-pointer border-none"
+          className="w-full cursor-pointer rounded border-none bg-blue-500 px-2 py-2 text-sm text-white hover:bg-blue-600"
         >
           Configure Rules
         </button>
         <button
           onClick={handleApplyRules}
-          className="w-full px-2 py-2 text-sm text-white bg-blue-500 hover:bg-blue-600 rounded cursor-pointer border-none"
+          className="w-full cursor-pointer rounded border-none bg-blue-500 px-2 py-2 text-sm text-white hover:bg-blue-600"
         >
           Apply Rules
         </button>
         {status && (
-          <div className="mt-0.5 text-sm text-gray-600 text-center">
+          <div className="mt-0.5 text-center text-sm text-gray-600">
             {status}
           </div>
         )}
