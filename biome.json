@@ -12,24 +12,20 @@
     "attributePosition": "auto",
     "bracketSpacing": true,
     "ignore": [
-      "**/dist",
-      "**/node_modules",
-      "**/npm-debug.log",
-      "**/yarn-error.log",
-      "**/.DS_Store"
+      "dist",
+      "node_modules",
+      "npm-debug.log",
+      "yarn-error.log",
+      ".DS_Store"
     ]
   },
   "organizeImports": { "enabled": true },
   "linter": { "enabled": true, "rules": { "recommended": true } },
   "javascript": {
     "formatter": {
-      "jsxQuoteStyle": "double",
-      "quoteProperties": "asNeeded",
-      "trailingCommas": "all",
-      "semicolons": "always",
+      "trailingCommas": "es5",
       "arrowParentheses": "always",
       "bracketSameLine": false,
-      "quoteStyle": "single",
       "attributePosition": "auto",
       "bracketSpacing": true
     }
