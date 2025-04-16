@@ -32,10 +32,22 @@ const Popup = () => {
 	};
 
 	return (
-		<div className='popup-container'>
-			<button onClick={handleOpenRules}>Configure Rules</button>
-			<button onClick={handleApplyRules}>Apply Rules</button>
-			{status && <div className='status'>{status}</div>}
+		<div className='w-[200px] p-2.5 font-sans'>
+			<div className='flex flex-col gap-2'>
+				<button
+					onClick={handleOpenRules}
+					className='w-full px-2 py-2 text-sm text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded cursor-pointer border-none'
+				>
+					Configure Rules
+				</button>
+				<button
+					onClick={handleApplyRules}
+					className='w-full px-2 py-2 text-sm text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded cursor-pointer border-none'
+				>
+					Apply Rules
+				</button>
+				{status && <div className='mt-0.5 text-sm text-gray-600 text-center'>{status}</div>}
+			</div>
 		</div>
 	);
 };

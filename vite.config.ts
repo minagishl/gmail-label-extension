@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { crx, defineManifest } from '@crxjs/vite-plugin';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 const manifest = defineManifest({
 	manifest_version: 3,
@@ -27,7 +28,7 @@ const manifest = defineManifest({
 });
 
 export default defineConfig({
-	plugins: [react(), crx({ manifest })],
+	plugins: [react(), tailwindcss(), crx({ manifest })],
 	build: {
 		rollupOptions: {
 			input: {
