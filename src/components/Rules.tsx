@@ -1,22 +1,25 @@
 import { useState, useEffect } from 'react';
 import { LabelRule, StorageData } from '../types';
 
-const Rules = () => {
+// Initial form state
+const emptyRule: LabelRule = {
+	label: '',
+	color: '#4285f4',
+	sender: '',
+	email: '',
+	subject: '',
+	content: '',
+};
+
+const Rules: React.FC = () => {
 	const [rules, setRules] = useState<LabelRule[]>([]);
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [showImportExport, setShowImportExport] = useState(false);
-	const [editingRuleIndex, setEditingRuleIndex] = useState<number>(-1);
+	const [editingRules, setEditingRules] = useState<Set<number>>(new Set());
+	const [newRule, setNewRule] = useState<LabelRule>(emptyRule);
 
-	// Form state
-	const [formData, setFormData] = useState<LabelRule>({
-		label: '',
-		color: '#4285f4',
-		sender: '',
-		email: '',
-		subject: '',
-		content: '',
-	});
-	const [useCustomColor, setUseCustomColor] = useState(false);
+	// Form states for each rule being edited
+	const [formStates, setFormStates] = useState<{ [key: number]: LabelRule }>({});
 	const [jsonData, setJsonData] = useState('');
 
 	const presetColors = ['#4285f4', '#ea4335', '#34a853', '#fbbc05', '#673ab7'];
@@ -31,8 +34,9 @@ const Rules = () => {
 		});
 	};
 
-	const handleSubmit = () => {
-		if (!formData.label) {
+	const handleSubmit = (index: number) => {
+		const formData = formStates[index];
+		if (!formData?.label) {
 			alert('Label name is required!');
 			return;
 		}
@@ -44,26 +48,35 @@ const Rules = () => {
 
 		chrome.storage.sync.get('labelRules', (data: StorageData) => {
 			const updatedRules = [...(data.labelRules || [])];
-			if (editingRuleIndex >= 0) {
-				updatedRules[editingRuleIndex] = formData;
-			} else {
-				updatedRules.push(formData);
-			}
+			updatedRules[index] = formData;
 
 			chrome.storage.sync.set({ labelRules: updatedRules }, () => {
-				setShowAddForm(false);
-				setEditingRuleIndex(-1);
+				const newEditingRules = new Set(editingRules);
+				newEditingRules.delete(index);
+				setEditingRules(newEditingRules);
+				const newFormStates = { ...formStates };
+				delete newFormStates[index];
+				setFormStates(newFormStates);
 				loadRules();
-				resetForm();
 			});
 		});
 	};
 
 	const handleEdit = (index: number) => {
-		setEditingRuleIndex(index);
-		setFormData(rules[index]);
-		setUseCustomColor(!presetColors.includes(rules[index].color));
-		setShowAddForm(true);
+		const newEditingRules = new Set(editingRules);
+		if (newEditingRules.has(index)) {
+			newEditingRules.delete(index);
+			const newFormStates = { ...formStates };
+			delete newFormStates[index];
+			setFormStates(newFormStates);
+		} else {
+			newEditingRules.add(index);
+			setFormStates({
+				...formStates,
+				[index]: { ...rules[index] },
+			});
+		}
+		setEditingRules(newEditingRules);
 		setShowImportExport(false);
 	};
 
@@ -116,15 +129,29 @@ const Rules = () => {
 	};
 
 	const resetForm = () => {
-		setFormData({
-			label: '',
-			color: '#4285f4',
-			sender: '',
-			email: '',
-			subject: '',
-			content: '',
+		setFormStates({});
+		setNewRule(emptyRule);
+	};
+
+	const handleAddRule = () => {
+		if (!newRule.label) {
+			alert('Label name is required!');
+			return;
+		}
+
+		if (!newRule.sender && !newRule.email && !newRule.subject && !newRule.content) {
+			alert('At least one matching condition is required!');
+			return;
+		}
+
+		chrome.storage.sync.get('labelRules', (data: StorageData) => {
+			const updatedRules = [...(data.labelRules || []), newRule];
+			chrome.storage.sync.set({ labelRules: updatedRules }, () => {
+				setShowAddForm(false);
+				resetForm();
+				loadRules();
+			});
 		});
-		setUseCustomColor(false);
 	};
 
 	const showImportExportForm = () => {
@@ -140,7 +167,11 @@ const Rules = () => {
 			{/* Main Buttons */}
 			<div className='flex gap-2.5 my-5'>
 				<button
-					onClick={() => setShowAddForm(true)}
+					onClick={() => {
+						setShowAddForm(true);
+						setNewRule(emptyRule);
+						setShowImportExport(false);
+					}}
 					className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0] font-semibold'
 				>
 					Add New Rule
@@ -159,68 +190,10 @@ const Rules = () => {
 				</button>
 			</div>
 
-			{/* Rules List */}
-			<div>
-				{rules.length === 0 ? (
-					<p>No rules found. Click "Add New Rule" to create one.</p>
-				) : (
-					rules.map((rule, index) => (
-						<div
-							key={index}
-							className='bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm'
-						>
-							<h3 className='mt-0 flex items-center gap-2'>
-								<span
-									className='w-3 h-3 rounded-full inline-block'
-									style={{ backgroundColor: rule.color }}
-								></span>
-								Rule {index + 1}: {rule.label}
-							</h3>
-							{rule.sender && (
-								<p>
-									<strong>Sender:</strong> {rule.sender}
-								</p>
-							)}
-							{rule.email && (
-								<p>
-									<strong>Email:</strong> {rule.email}
-								</p>
-							)}
-							{rule.subject && (
-								<p>
-									<strong>Subject contains:</strong> {rule.subject}
-								</p>
-							)}
-							{rule.content && (
-								<p>
-									<strong>Content contains:</strong> {rule.content}
-								</p>
-							)}
-							<div className='flex gap-2.5 mt-2.5'>
-								<button
-									onClick={() => handleEdit(index)}
-									className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
-								>
-									Edit
-								</button>
-								<button
-									className='px-4 py-2 bg-[#dc3545] text-white rounded border-none cursor-pointer hover:bg-[#bb2d3b]'
-									onClick={() => handleDelete(index)}
-								>
-									Delete
-								</button>
-							</div>
-						</div>
-					))
-				)}
-			</div>
-
-			{/* Add/Edit Rule Form */}
+			{/* Add New Rule Form */}
 			{showAddForm && (
-				<div className='bg-white border border-gray-200 rounded-lg p-5 mt-5 shadow-sm'>
-					<h2 className='text-gray-800 mb-4'>
-						{editingRuleIndex >= 0 ? 'Edit Rule' : 'Add New Rule'}
-					</h2>
+				<div className='bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm'>
+					<h2 className='text-gray-800 mb-4'>Add New Rule</h2>
 					<div className='mb-4'>
 						<label htmlFor='labelName' className='block mb-1 font-medium'>
 							Label Name *
@@ -229,64 +202,40 @@ const Rules = () => {
 							type='text'
 							id='labelName'
 							className='w-full p-2 border border-gray-200 rounded'
-							value={formData.label}
-							onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+							value={newRule.label}
+							onChange={(e) => setNewRule({ ...newRule, label: e.target.value })}
 						/>
 					</div>
 
 					<div className='mb-4'>
 						<label className='block mb-1 font-medium'>Label Color</label>
-						<div className='space-x-4'>
-							<label className='inline-flex items-center'>
-								<input
-									type='radio'
-									className='mr-2'
-									checked={!useCustomColor}
-									onChange={() => setUseCustomColor(false)}
-								/>
-								Use preset color
-							</label>
-							<label className='inline-flex items-center'>
-								<input
-									type='radio'
-									className='mr-2'
-									checked={useCustomColor}
-									onChange={() => setUseCustomColor(true)}
-								/>
-								Use custom color
-							</label>
-						</div>
-
-						{!useCustomColor ? (
-							<div className='flex gap-2.5 flex-wrap mt-2.5'>
-								{presetColors.map((color) => (
-									<label key={color} className='relative'>
-										<input
-											type='radio'
-											name='labelColor'
-											value={color}
-											checked={formData.color === color}
-											onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-											className='absolute opacity-0 w-0 h-0'
-										/>
-										<span
-											className='block w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400'
-											style={{
-												backgroundColor: color,
-												borderColor: formData.color === color ? '#000' : 'transparent',
-											}}
-										></span>
-									</label>
-								))}
-							</div>
-						) : (
+						<div className='flex gap-2.5 flex-wrap mt-2.5'>
+							{presetColors.map((color) => (
+								<label key={color} className='relative'>
+									<input
+										type='radio'
+										name='labelColor'
+										value={color}
+										checked={newRule.color === color}
+										onChange={(e) => setNewRule({ ...newRule, color: e.target.value })}
+										className='absolute opacity-0 w-0 h-0'
+									/>
+									<span
+										className='block w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400'
+										style={{
+											backgroundColor: color,
+											borderColor: newRule.color === color ? '#000' : 'transparent',
+										}}
+									></span>
+								</label>
+							))}
 							<input
 								type='color'
-								className='mt-2.5 w-24 p-1'
-								value={formData.color}
-								onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+								className='w-24 p-1'
+								value={newRule.color}
+								onChange={(e) => setNewRule({ ...newRule, color: e.target.value })}
 							/>
-						)}
+						</div>
 					</div>
 
 					<div className='mb-4'>
@@ -297,8 +246,8 @@ const Rules = () => {
 							type='text'
 							id='sender'
 							className='w-full p-2 border border-gray-200 rounded'
-							value={formData.sender}
-							onChange={(e) => setFormData({ ...formData, sender: e.target.value })}
+							value={newRule.sender}
+							onChange={(e) => setNewRule({ ...newRule, sender: e.target.value })}
 						/>
 					</div>
 
@@ -310,8 +259,8 @@ const Rules = () => {
 							type='text'
 							id='email'
 							className='w-full p-2 border border-gray-200 rounded'
-							value={formData.email}
-							onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+							value={newRule.email}
+							onChange={(e) => setNewRule({ ...newRule, email: e.target.value })}
 						/>
 					</div>
 
@@ -323,8 +272,8 @@ const Rules = () => {
 							type='text'
 							id='subject'
 							className='w-full p-2 border border-gray-200 rounded'
-							value={formData.subject}
-							onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+							value={newRule.subject}
+							onChange={(e) => setNewRule({ ...newRule, subject: e.target.value })}
 						/>
 					</div>
 
@@ -336,14 +285,14 @@ const Rules = () => {
 							type='text'
 							id='content'
 							className='w-full p-2 border border-gray-200 rounded'
-							value={formData.content}
-							onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+							value={newRule.content}
+							onChange={(e) => setNewRule({ ...newRule, content: e.target.value })}
 						/>
 					</div>
 
 					<div className='flex gap-2.5 mt-5'>
 						<button
-							onClick={handleSubmit}
+							onClick={handleAddRule}
 							className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
 						>
 							Save Rule
@@ -351,7 +300,6 @@ const Rules = () => {
 						<button
 							onClick={() => {
 								setShowAddForm(false);
-								setEditingRuleIndex(-1);
 								resetForm();
 							}}
 							className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
@@ -361,6 +309,216 @@ const Rules = () => {
 					</div>
 				</div>
 			)}
+
+			{/* Rules List */}
+			<div>
+				{rules.length === 0 ? (
+					<p>No rules found. Click "Add New Rule" to create one.</p>
+				) : (
+					rules.map((rule, index) => (
+						<div
+							key={index}
+							className='bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm'
+						>
+							{editingRules.has(index) ? (
+								<div>
+									<h2 className='text-gray-800 mb-4'>Edit Rule {index + 1}</h2>
+									<div className='mb-4'>
+										<label htmlFor={`labelName-${index}`} className='block mb-1 font-medium'>
+											Label Name *
+										</label>
+										<input
+											type='text'
+											id={`labelName-${index}`}
+											className='w-full p-2 border border-gray-200 rounded'
+											value={formStates[index]?.label || ''}
+											onChange={(e) =>
+												setFormStates({
+													...formStates,
+													[index]: { ...formStates[index], label: e.target.value },
+												})
+											}
+										/>
+									</div>
+
+									<div className='mb-4'>
+										<label className='block mb-1 font-medium'>Label Color</label>
+										<div className='flex gap-2.5 flex-wrap mt-2.5'>
+											{presetColors.map((color) => (
+												<label key={color} className='relative'>
+													<input
+														type='radio'
+														name={`labelColor-${index}`}
+														value={color}
+														checked={formStates[index]?.color === color}
+														onChange={(e) =>
+															setFormStates({
+																...formStates,
+																[index]: { ...formStates[index], color: e.target.value },
+															})
+														}
+														className='absolute opacity-0 w-0 h-0'
+													/>
+													<span
+														className='block w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400'
+														style={{
+															backgroundColor: color,
+															borderColor:
+																formStates[index]?.color === color ? '#000' : 'transparent',
+														}}
+													></span>
+												</label>
+											))}
+											<input
+												type='color'
+												className='w-24 p-1'
+												value={formStates[index]?.color || '#4285f4'}
+												onChange={(e) =>
+													setFormStates({
+														...formStates,
+														[index]: { ...formStates[index], color: e.target.value },
+													})
+												}
+											/>
+										</div>
+									</div>
+
+									<div className='mb-4'>
+										<label htmlFor={`sender-${index}`} className='block mb-1 font-medium'>
+											Sender Name (comma-separated)
+										</label>
+										<input
+											type='text'
+											id={`sender-${index}`}
+											className='w-full p-2 border border-gray-200 rounded'
+											value={formStates[index]?.sender || ''}
+											onChange={(e) =>
+												setFormStates({
+													...formStates,
+													[index]: { ...formStates[index], sender: e.target.value },
+												})
+											}
+										/>
+									</div>
+
+									<div className='mb-4'>
+										<label htmlFor={`email-${index}`} className='block mb-1 font-medium'>
+											Email Address (comma-separated)
+										</label>
+										<input
+											type='text'
+											id={`email-${index}`}
+											className='w-full p-2 border border-gray-200 rounded'
+											value={formStates[index]?.email || ''}
+											onChange={(e) =>
+												setFormStates({
+													...formStates,
+													[index]: { ...formStates[index], email: e.target.value },
+												})
+											}
+										/>
+									</div>
+
+									<div className='mb-4'>
+										<label htmlFor={`subject-${index}`} className='block mb-1 font-medium'>
+											Subject Contains (comma-separated)
+										</label>
+										<input
+											type='text'
+											id={`subject-${index}`}
+											className='w-full p-2 border border-gray-200 rounded'
+											value={formStates[index]?.subject || ''}
+											onChange={(e) =>
+												setFormStates({
+													...formStates,
+													[index]: { ...formStates[index], subject: e.target.value },
+												})
+											}
+										/>
+									</div>
+
+									<div className='mb-4'>
+										<label htmlFor={`content-${index}`} className='block mb-1 font-medium'>
+											Content Contains (comma-separated)
+										</label>
+										<input
+											type='text'
+											id={`content-${index}`}
+											className='w-full p-2 border border-gray-200 rounded'
+											value={formStates[index]?.content || ''}
+											onChange={(e) =>
+												setFormStates({
+													...formStates,
+													[index]: { ...formStates[index], content: e.target.value },
+												})
+											}
+										/>
+									</div>
+
+									<div className='flex gap-2.5 mt-5'>
+										<button
+											onClick={() => handleSubmit(index)}
+											className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+										>
+											Save
+										</button>
+										<button
+											onClick={() => handleEdit(index)}
+											className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+										>
+											Cancel
+										</button>
+									</div>
+								</div>
+							) : (
+								<>
+									<h3 className='mt-0 flex items-center gap-2'>
+										<span
+											className='w-3 h-3 rounded-full inline-block'
+											style={{ backgroundColor: rule.color }}
+										></span>
+										Rule {index + 1}: {rule.label}
+									</h3>
+									{rule.sender && (
+										<p>
+											<strong>Sender:</strong> {rule.sender}
+										</p>
+									)}
+									{rule.email && (
+										<p>
+											<strong>Email:</strong> {rule.email}
+										</p>
+									)}
+									{rule.subject && (
+										<p>
+											<strong>Subject contains:</strong> {rule.subject}
+										</p>
+									)}
+									{rule.content && (
+										<p>
+											<strong>Content contains:</strong> {rule.content}
+										</p>
+									)}
+									<div className='flex gap-2.5 mt-2.5'>
+										<button
+											onClick={() => handleEdit(index)}
+											className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+										>
+											Edit
+										</button>
+										<button
+											className='px-4 py-2 bg-[#dc3545] text-white rounded border-none cursor-pointer hover:bg-[#bb2d3b]'
+											onClick={() => handleDelete(index)}
+										>
+											Delete
+										</button>
+									</div>
+								</>
+							)}
+						</div>
+					))
+				)}
+			</div>
 
 			{/* Import/Export Form */}
 			{showImportExport && (
