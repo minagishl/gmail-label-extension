@@ -10,12 +10,39 @@ Gmail Label Extension is a Chrome extension that automatically creates and appli
 - Import/Export functionality for rules
 - Real-time email monitoring and automatic labeling
 
+## Technology Stack
+
+- React 19
+- TypeScript
+- Tailwind CSS
+- Vite
+
+## Development Setup
+
+1. Install dependencies:
+
+```bash
+pnpm install
+```
+
+2. Start development server:
+
+```bash
+pnpm dev
+```
+
+3. Build for production:
+
+```bash
+pnpm build
+```
+
 ## Installation
 
-1. Clone or download this repository
+1. Run `pnpm build` to create the production build
 2. Open `chrome://extensions` in Chrome browser
 3. Enable "Developer mode" in the top right
-4. Click "Load unpacked" and select the downloaded folder
+4. Click "Load unpacked" and select the `dist` folder
 
 ## Usage
 
@@ -46,10 +73,18 @@ Note: At least one condition must be set.
 
 ## Technical Details
 
-- Compliant with Manifest V3
+- Built with React and TypeScript for robust type safety
+- Vite for fast development and optimized builds
+- Tailwind CSS for utility-first styling
+- Chrome Extension Manifest V3 compliant
 - Content scripts for Gmail page monitoring
 - Chrome Storage Sync API for rule synchronization
 - MutationObserver for dynamic email list updates
+
+## Requirements
+
+- Node.js 20 or higher
+- pnpm package manager
 
 ## License
 
