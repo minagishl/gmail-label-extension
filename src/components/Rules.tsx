@@ -162,7 +162,7 @@ const Rules: React.FC = () => {
 
 	return (
 		<div className='max-w-3xl mx-auto p-5 font-sans w-full'>
-			<h1 className='text-[#1a73e8] mb-5 text-2xl font-semibold'>Gmail Label Rules</h1>
+			<h1 className='text-blue-500 mb-5 text-2xl font-semibold'>Gmail Label Rules</h1>
 
 			{/* Main Buttons */}
 			<div className='flex gap-2.5 my-5'>
@@ -172,19 +172,19 @@ const Rules: React.FC = () => {
 						setNewRule(emptyRule);
 						setShowImportExport(false);
 					}}
-					className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0] font-semibold'
+					className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600 font-semibold'
 				>
 					Add New Rule
 				</button>
 				<button
 					onClick={showImportExportForm}
-					className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0] font-semibold'
+					className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600 font-semibold'
 				>
 					Import Rules
 				</button>
 				<button
 					onClick={handleExport}
-					className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0] font-semibold'
+					className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600 font-semibold'
 				>
 					Export Rules
 				</button>
@@ -293,7 +293,7 @@ const Rules: React.FC = () => {
 					<div className='flex gap-2.5 mt-5'>
 						<button
 							onClick={handleAddRule}
-							className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+							className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600'
 						>
 							Save Rule
 						</button>
@@ -302,7 +302,7 @@ const Rules: React.FC = () => {
 								setShowAddForm(false);
 								resetForm();
 							}}
-							className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+							className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600'
 						>
 							Cancel
 						</button>
@@ -458,13 +458,13 @@ const Rules: React.FC = () => {
 									<div className='flex gap-2.5 mt-5'>
 										<button
 											onClick={() => handleSubmit(index)}
-											className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+											className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600'
 										>
 											Save
 										</button>
 										<button
 											onClick={() => handleEdit(index)}
-											className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+											className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600'
 										>
 											Cancel
 										</button>
@@ -502,12 +502,12 @@ const Rules: React.FC = () => {
 									<div className='flex gap-2.5 mt-2.5'>
 										<button
 											onClick={() => handleEdit(index)}
-											className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+											className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600'
 										>
 											Edit
 										</button>
 										<button
-											className='px-4 py-2 bg-[#dc3545] text-white rounded border-none cursor-pointer hover:bg-[#bb2d3b]'
+											className='px-4 py-2 bg-red-500 text-white rounded border-none cursor-pointer hover:bg-red-600'
 											onClick={() => handleDelete(index)}
 										>
 											Delete
@@ -533,7 +533,7 @@ const Rules: React.FC = () => {
 					<div className='flex gap-2.5 mt-5'>
 						<button
 							onClick={handleImport}
-							className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+							className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600'
 						>
 							Save
 						</button>
@@ -542,7 +542,7 @@ const Rules: React.FC = () => {
 								setShowImportExport(false);
 								setJsonData('');
 							}}
-							className='px-4 py-2 bg-[#1a73e8] text-white rounded border-none cursor-pointer hover:bg-[#1557b0]'
+							className='px-4 py-2 bg-blue-500 text-white rounded border-none cursor-pointer hover:bg-blue-600'
 						>
 							Cancel
 						</button>
