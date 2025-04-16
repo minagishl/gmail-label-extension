@@ -1,3 +1,3 @@
 {
-	"recommendations": ["EditorConfig.EditorConfig"]
+  "recommendations": ["biomejs.biome", "EditorConfig.EditorConfig"]
 }
