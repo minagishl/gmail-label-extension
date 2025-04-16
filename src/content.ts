@@ -1,4 +1,4 @@
-import { StorageData } from "./types";
+import type { StorageData } from "./types";
 
 // Search for the div that affects mail rows
 function searchMailRowsContainer(): Promise<HTMLElement> {
@@ -170,11 +170,7 @@ async function initializeExtension(): Promise<void> {
 
     // Set up history state observer
     const pushState = history.pushState;
-    history.pushState = function (
-      data: any,
-      unused: string,
-      url?: string | URL
-    ) {
+    history.pushState = (data: any, unused: string, url?: string | URL) => {
       pushState.call(history, data, unused, url);
       setTimeout(processEmails, 1000);
     };

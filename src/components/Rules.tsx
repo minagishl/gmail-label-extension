@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { LabelRule, StorageData } from "../types";
+import { useEffect, useState } from "react";
+import type { LabelRule, StorageData } from "../types";
 
 // Initial form state
 const emptyRule: LabelRule = {

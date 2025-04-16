@@ -62,7 +62,7 @@ const Popup = () => {
 
 // This function will be injected into the Gmail page
 function applyLabelRules(): void {
-  chrome.storage.sync.get("labelRules", function (data) {
+  chrome.storage.sync.get("labelRules", (data) => {
     const rules = data.labelRules || [];
     if (rules.length === 0) {
       console.warn("No label rules found");
