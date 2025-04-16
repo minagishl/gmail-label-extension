@@ -7,15 +7,9 @@ function searchMailRowsContainer(): Promise<HTMLElement> {
 			const navigationDiv = document.querySelector('div[role="navigation"]');
 			if (navigationDiv) {
 				const parent = navigationDiv.parentElement;
-				if (parent) {
-					// Find all sibling divs
-					const siblingDivs = Array.from(parent.children).filter((el) => el.tagName === 'DIV');
-					// Get the third div after navigationDiv
-					const targetDiv = siblingDivs[siblingDivs.indexOf(navigationDiv) + 3] as HTMLElement;
-					if (targetDiv) {
-						clearInterval(interval);
-						resolve(targetDiv);
-					}
+				if (parent?.parentElement) {
+					clearInterval(interval);
+					resolve(parent.parentElement);
 				}
 			}
 		}, 1000);
