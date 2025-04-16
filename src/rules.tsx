@@ -3,8 +3,11 @@ import ReactDOM from "react-dom/client";
 import Rules from "./components/Rules";
 import "./style.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Rules />
-  </React.StrictMode>
-);
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <Rules />
+    </React.StrictMode>
+  );
+}

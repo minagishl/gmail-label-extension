@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { LabelRule } from "../types";
 
 const Popup = () => {
   const [status, setStatus] = useState<string>("");
@@ -40,12 +41,14 @@ const Popup = () => {
       <div className="flex flex-col gap-2">
         <button
           onClick={handleOpenRules}
+          type="button"
           className="w-full cursor-pointer rounded border-none bg-blue-500 px-2 py-2 text-sm text-white hover:bg-blue-600"
         >
           Configure Rules
         </button>
         <button
           onClick={handleApplyRules}
+          type="button"
           className="w-full cursor-pointer rounded border-none bg-blue-500 px-2 py-2 text-sm text-white hover:bg-blue-600"
         >
           Apply Rules
@@ -101,8 +104,8 @@ function applyLabelRules(): void {
     });
 
     // Apply rules to each email
-    emails.forEach((email) => {
-      rules.forEach((rule: any) => {
+    for (const email of emails) {
+      for (const rule of rules as LabelRule[]) {
         let matches = false;
 
         if (rule.sender && email.sender) {
@@ -130,8 +133,8 @@ function applyLabelRules(): void {
           // TODO: Implement Gmail label API integration
           console.log(`Match found! Apply label "${rule.label}" to:`, email);
         }
-      });
-    });
+      }
+    }
   });
 }
 

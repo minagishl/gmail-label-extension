@@ -81,34 +81,26 @@ async function processEmailElement(element: HTMLElement): Promise<void> {
     let matches = false;
 
     // Match against rule conditions with specific email parts
-    const matchesSender =
-      rule.sender &&
-      rule.sender
-        .toLowerCase()
-        .split(",")
-        .some(
-          (word) =>
-            word.trim() &&
-            (senderName.includes(word.trim()) || sender.includes(word.trim()))
-        );
-    const matchesEmail =
-      rule.email &&
-      rule.email
-        .toLowerCase()
-        .split(",")
-        .some((word) => word.trim() && sender.includes(word.trim()));
-    const matchesSubject =
-      rule.subject &&
-      rule.subject
-        .toLowerCase()
-        .split(",")
-        .some((word) => word.trim() && subject.includes(word.trim()));
-    const matchesContent =
-      rule.content &&
-      rule.content
-        .toLowerCase()
-        .split(",")
-        .some((word) => word.trim() && snippet.includes(word.trim()));
+    const matchesSender = rule.sender
+      ?.toLowerCase()
+      .split(",")
+      .some(
+        (word) =>
+          word.trim() &&
+          (senderName.includes(word.trim()) || sender.includes(word.trim()))
+      );
+    const matchesEmail = rule.email
+      ?.toLowerCase()
+      .split(",")
+      .some((word) => word.trim() && sender.includes(word.trim()));
+    const matchesSubject = rule.subject
+      ?.toLowerCase()
+      .split(",")
+      .some((word) => word.trim() && subject.includes(word.trim()));
+    const matchesContent = rule.content
+      ?.toLowerCase()
+      .split(",")
+      .some((word) => word.trim() && snippet.includes(word.trim()));
 
     // If any condition matches, set matches to true
     matches = Boolean(
@@ -170,7 +162,7 @@ async function initializeExtension(): Promise<void> {
 
     // Set up history state observer
     const pushState = history.pushState;
-    history.pushState = (data: any, unused: string, url?: string | URL) => {
+    history.pushState = (data: unknown, unused: string, url?: string | URL) => {
       pushState.call(history, data, unused, url);
       setTimeout(processEmails, 1000);
     };
@@ -216,7 +208,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === "sync" && changes.labelRules) {
     // Clear existing labels
     const existingLabels = document.querySelectorAll(".gmail-label-extension");
-    existingLabels.forEach((label) => label.remove());
+    for (const label of existingLabels) {
+      label.remove();
+    }
 
     // Reprocess emails with new rules
     processEmails().catch((error) => {
