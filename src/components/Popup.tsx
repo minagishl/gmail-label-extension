@@ -16,8 +16,16 @@ const Popup = () => {
       currentWindow: true,
     });
 
-    if (!tab?.url?.includes("mail.google.com")) {
-      setStatus("Please open Gmail to apply rules");
+    try {
+      const url = new URL(tab?.url ?? "");
+
+      const allowedHosts = ["mail.google.com"];
+      if (!allowedHosts.includes(url.hostname)) {
+        setStatus("Please open Gmail to apply rules");
+        return;
+      }
+    } catch (error) {
+      setStatus("Invalid URL");
       return;
     }
 
