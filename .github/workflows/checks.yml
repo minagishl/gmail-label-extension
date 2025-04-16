@@ -30,7 +30,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Run Prettier
+      - name: Run Lint
         run: pnpm lint
 
   scan:
